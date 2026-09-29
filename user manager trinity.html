@@ -1,0 +1,349 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>TRINITY ERP - User Account Manager</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root {
+--primary: #006c4c;
+--primary-light: #e6f4f1;
+--surface: #ffffff;
+--surface-variant: #f8fafc;
+--background: #f1f5f9;
+--on-background: #1e293b;
+--on-surface: #334155;
+--error: #ba1a1a;
+--outline: #e2e8f0;
+}
+* { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Inter', sans-serif; -webkit-tap-highlight-color: transparent; }
+body { background: var(--background); color: var(--on-background); min-height: 100vh; padding: 40px 16px; display: flex; justify-content: center; }
+.wrap { width: 100%; max-width: 560px; }
+.head-card { text-align: center; margin-bottom: 20px; }
+.logo-icon {
+width: 64px; height: 64px; background: var(--primary); border-radius: 16px;
+display: inline-flex; align-items: center; justify-content: center;
+font-size: 32px; color: white; font-weight: 800;
+box-shadow: 0 8px 24px rgba(0, 108, 76, 0.25); margin-bottom: 12px;
+}
+.head-card h1 { font-size: 26px; font-weight: 800; color: var(--primary); letter-spacing: -0.5px; }
+.head-card .subtitle { color: var(--on-surface); margin: 6px 0 12px 0; font-size: 13px; opacity: 0.7; font-weight: 500; }
+.status-chip { display: inline-block; padding: 6px 14px; border-radius: 20px; font-size: 11px; font-weight: 700; }
+.status-chip.ok { background: #dcfce7; color: #166534; }
+.status-chip.warn { background: #fef3c7; color: #92400e; }
+.card { background: var(--surface); border-radius: 16px; padding: 24px; border: 1px solid var(--outline); box-shadow: 0 2px 10px rgba(0,0,0,0.02); margin-bottom: 20px; }
+.card h2 { font-size: 16px; font-weight: 700; color: var(--primary); margin-bottom: 16px; }
+.form-group { margin-bottom: 16px; }
+.form-group label { display: block; font-size: 11px; font-weight: 700; color: var(--on-surface); margin-bottom: 6px; text-transform: uppercase; letter-spacing: 0.5px; opacity: 0.8; }
+input, select { width: 100%; padding: 12px 14px; border: 1px solid var(--outline); border-radius: 10px; font-size: 13px; outline: none; transition: 0.2s; background: var(--surface); color: var(--on-background); }
+input:focus, select:focus { border-color: var(--primary); box-shadow: 0 0 0 3px rgba(0, 108, 76, 0.1); }
+.pass-row { display: flex; gap: 8px; align-items: stretch; }
+.pass-row input { flex: 1; }
+.btn { background-color: var(--primary); color: white; border: none; padding: 12px 20px; border-radius: 10px; font-size: 13px; font-weight: 600; cursor: pointer; transition: 0.2s; box-shadow: 0 1px 3px rgba(0,0,0,0.04); }
+.btn:hover { opacity: 0.9; transform: translateY(-1px); }
+.btn:disabled { opacity: 0.6; cursor: not-allowed; transform: none; }
+.btn-outline { background-color: #ffffff; border: 1px solid var(--outline); color: var(--on-surface); }
+.btn-outline:hover { background-color: var(--surface-variant); }
+.btn-danger { background-color: var(--error); }
+.btn-small { padding: 8px 12px; font-size: 12px; border-radius: 8px; }
+.btn-block { width: 100%; padding: 14px; font-size: 14px; font-weight: 700; }
+.msg { display: none; margin-top: 12px; font-size: 12px; font-weight: 600; padding: 10px 12px; border-radius: 8px; text-align: center; }
+.msg.success { display: block; background: #f0fdf4; color: #166534; border: 1px solid #86efac; }
+.msg.error { display: block; background: #fef2f2; color: var(--error); border: 1px solid #fecaca; }
+.cred-box { display: none; margin-top: 12px; background: var(--primary-light); border: 1px solid #bfe9dd; border-radius: 10px; padding: 12px 14px; font-size: 12px; font-weight: 600; color: var(--primary); align-items: center; justify-content: space-between; gap: 10px; flex-wrap: wrap; }
+.cred-box.show { display: flex; }
+.table-wrap { overflow-x: auto; border: 1px solid var(--outline); border-radius: 12px; }
+table { width: 100%; border-collapse: collapse; background: white; min-width: 420px; }
+th, td { padding: 12px 14px; text-align: left; border-bottom: 1px solid var(--outline); font-size: 13px; white-space: nowrap; }
+th { color: var(--on-surface); font-weight: 700; text-transform: uppercase; font-size: 10px; background: var(--surface-variant); letter-spacing: 0.5px; }
+tr:last-child td { border-bottom: none; }
+.role-badge { display: inline-block; background: var(--primary-light); color: var(--primary); padding: 3px 10px; border-radius: 6px; font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.3px; }
+.hint-box { background: #fffbeb; border: 1px solid #fde68a; border-radius: 12px; padding: 16px 18px; font-size: 12px; color: #78350f; line-height: 1.7; }
+.hint-box ol { margin: 8px 0 8px 18px; }
+.hint-box code { background: #fef3c7; padding: 1px 6px; border-radius: 5px; font-size: 11px; }
+.toast { position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%) translateY(20px); background: #334155; color: white; padding: 14px 28px; border-radius: 12px; font-size: 13px; font-weight: 600; opacity: 0; transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); z-index: 3000; box-shadow: 0 8px 24px rgba(0,0,0,0.15); pointer-events: none; }
+.toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+.toast.success { background: var(--primary); }
+.toast.error { background: var(--error); }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<div class="head-card">
+<div class="logo-icon">T</div>
+<h1>TRINITY ERP</h1>
+<p class="subtitle">User Account Manager • Admin Tool</p>
+<span id="conn-status" class="status-chip warn">Checking connection...</span>
+</div>
+
+<div class="card">
+<h2>➕ Create New User</h2>
+<div class="form-group">
+<label>Username</label>
+<input type="text" id="new-username" placeholder="e.g. manager01" autocomplete="off">
+</div>
+<div class="form-group">
+<label>Password</label>
+<div class="pass-row">
+<input type="password" id="new-password" placeholder="Min 4 characters" autocomplete="off">
+<button class="btn btn-outline btn-small" id="eye-btn" type="button" onclick="togglePass()" title="Show / Hide">👁️</button>
+<button class="btn btn-outline btn-small" type="button" onclick="generatePassword()" title="Generate random password">🎲</button>
+</div>
+</div>
+<div class="form-group">
+<label>Role</label>
+<select id="new-role">
+<option value="Administrator">Administrator</option>
+<option value="Manager">Manager</option>
+<option value="Sales Staff">Sales Staff</option>
+<option value="Accountant">Accountant</option>
+</select>
+</div>
+<button class="btn btn-block" id="create-btn" onclick="createUser()">Create User & Push to Firebase</button>
+<p id="form-msg" class="msg"></p>
+<div id="cred-box" class="cred-box">
+<span id="cred-text"></span>
+<button class="btn btn-outline btn-small" type="button" onclick="copyCredentials()">📋 Copy</button>
+</div>
+</div>
+
+<div class="card">
+<h2>👥 Existing Users</h2>
+<div class="table-wrap">
+<table>
+<thead><tr><th>Username</th><th>Role</th><th>Created</th><th>Action</th></tr></thead>
+<tbody id="users-tbody"></tbody>
+</table>
+</div>
+</div>
+
+<div class="hint-box">
+<strong>📌 How to use:</strong>
+<ol>
+<li>Paste the <em>same</em> <code>firebaseConfig</code> (ja <code>trinity.html</code> e diyecho) into this file's script section below.</li>
+<li>Create users here — they are pushed to the Firestore <code>users</code> collection (doc ID = lowercase username).</li>
+<li>Then login in <code>trinity.html</code> with those credentials.</li>
+<li>If Firebase config is empty, users save to localStorage (<code>trinity_users</code>) — open both files from the same folder/origin so login works.</li>
+<li>Default auto-created login: <code>admin / 1234</code>.</li>
+</ol>
+<strong>⚠️ Security:</strong> Keep this file private. Anyone with this file + your Firebase config can create accounts.
+</div>
+
+</div>
+
+<!-- Firebase compat CDN (v10) — same as trinity.html -->
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
+<script>
+// ==========================================
+// FIREBASE CONFIGURATION (SAME AS trinity.html)
+// ==========================================
+const firebaseConfig = {
+  apiKey: "AIzaSyAGifEexDtWagaAJhANl_hQgbMGzaXiOiM",
+  authDomain: "trinity-erp-c4356.firebaseapp.com",
+  projectId: "trinity-erp-c4356",
+  storageBucket: "trinity-erp-c4356.firebasestorage.app",
+  messagingSenderId: "22426929130",
+  appId: "1:22426929130:web:e14fe1c0fcd8ecaadf1493",
+  measurementId: "G-1Q441RJ68Y"
+};
+let USE_FIRESTORE = false;
+let db = null;
+(function initFirebase() {
+try {
+if (firebaseConfig.apiKey && typeof firebase !== 'undefined') {
+if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
+db = firebase.firestore();
+USE_FIRESTORE = true;
+}
+} catch (e) {
+console.warn('[UserManager] Firebase init failed, using localStorage fallback:', e);
+USE_FIRESTORE = false;
+}
+})();
+
+// ==========================================
+// MUST MATCH trinity.html EXACTLY (login depends on this)
+// ==========================================
+function simpleHash(str) {
+let hash = 0;
+for (let i = 0; i < str.length; i++) {
+const char = str.charCodeAt(i);
+hash = ((hash << 5) - hash) + char;
+hash = hash & hash;
+}
+return Math.abs(hash).toString(36) + str.length.toString(36);
+}
+
+// ---------- localStorage fallback helpers ----------
+function localGetUsers() { return JSON.parse(localStorage.getItem('trinity_users') || '[]'); }
+function localSetUsers(u) { localStorage.setItem('trinity_users', JSON.stringify(u)); }
+
+// ---------- UI helpers ----------
+function escapeHtml(s) {
+return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+function showMsg(text, type) {
+const el = document.getElementById('form-msg');
+el.textContent = text;
+el.className = 'msg ' + type;
+}
+function showToast(message, type = 'success') {
+const toast = document.createElement('div');
+toast.className = `toast ${type}`;
+toast.innerText = message;
+document.body.appendChild(toast);
+setTimeout(() => toast.classList.add('show'), 10);
+setTimeout(() => { toast.classList.remove('show'); setTimeout(() => toast.remove(), 300); }, 2500);
+}
+function renderStatus() {
+const el = document.getElementById('conn-status');
+if (USE_FIRESTORE) {
+el.textContent = '☁️ Firestore Connected: ' + firebaseConfig.projectId;
+el.className = 'status-chip ok';
+} else {
+el.textContent = '💾 Local Mode (Firebase config empty)';
+el.className = 'status-chip warn';
+}
+}
+function togglePass() {
+const inp = document.getElementById('new-password');
+const btn = document.getElementById('eye-btn');
+if (inp.type === 'password') { inp.type = 'text'; btn.textContent = '🙈'; }
+else { inp.type = 'password'; btn.textContent = '👁️'; }
+}
+function generatePassword() {
+const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnpqrstuvwxyz23456789@#$%&*';
+const arr = new Uint32Array(10);
+crypto.getRandomValues(arr);
+let p = '';
+for (let i = 0; i < arr.length; i++) p += chars[arr[i] % chars.length];
+document.getElementById('new-password').value = p;
+document.getElementById('new-password').type = 'text';
+document.getElementById('eye-btn').textContent = '🙈';
+showToast('Random password generated');
+}
+function showCredentials(u, p, r) {
+document.getElementById('cred-text').textContent = `Username: ${u}  |  Password: ${p}  |  Role: ${r}`;
+document.getElementById('cred-box').classList.add('show');
+}
+function copyCredentials() {
+const t = document.getElementById('cred-text').textContent;
+if (navigator.clipboard) {
+navigator.clipboard.writeText(t).then(() => showToast('Credentials copied!'));
+} else { showToast('Copy not supported', 'error'); }
+}
+
+// ==========================================
+// CREATE USER (push to Firestore users collection)
+// ==========================================
+async function createUser() {
+showMsg('', '');
+document.getElementById('form-msg').className = 'msg';
+document.getElementById('cred-box').classList.remove('show');
+
+const username = document.getElementById('new-username').value.trim();
+const password = document.getElementById('new-password').value;
+const role = document.getElementById('new-role').value;
+
+if (!username || !password) return showMsg('Please fill username and password!', 'error');
+if (!/^[a-zA-Z0-9_.-]{3,30}$/.test(username)) return showMsg('Username must be 3-30 chars (letters, numbers, . _ - only).', 'error');
+if (password.length < 4) return showMsg('Password must be at least 4 characters.', 'error');
+
+const key = username.toLowerCase();
+const userObj = {
+username: username,
+passwordHash: simpleHash(password),
+role: role,
+createdAt: new Date().toISOString()
+};
+
+const btn = document.getElementById('create-btn');
+btn.disabled = true;
+btn.textContent = 'Creating...';
+try {
+if (USE_FIRESTORE) {
+const ref = db.collection('users').doc(key);
+const snap = await ref.get();
+if (snap.exists) { showMsg('Username already exists in Firestore!', 'error'); return; }
+await ref.set(userObj);
+} else {
+const users = localGetUsers();
+if (users.find(u => u.username.toLowerCase() === key)) { showMsg('Username already exists locally!', 'error'); return; }
+users.push(userObj);
+localSetUsers(users);
+}
+showMsg(`✅ User "${username}" created successfully!`, 'success');
+showCredentials(username, password, role);
+document.getElementById('new-username').value = '';
+document.getElementById('new-password').value = '';
+document.getElementById('new-password').type = 'password';
+document.getElementById('eye-btn').textContent = '👁️';
+loadUsers();
+showToast('User created!');
+} catch (e) {
+console.error(e);
+showMsg('Failed: ' + (e.message || e) + ' — check Firestore config/rules.', 'error');
+} finally {
+btn.disabled = false;
+btn.textContent = 'Create User & Push to Firebase';
+}
+}
+
+// ==========================================
+// LIST + DELETE USERS
+// ==========================================
+async function loadUsers() {
+const tbody = document.getElementById('users-tbody');
+tbody.innerHTML = '<tr><td colspan="4" style="text-align:center; padding:14px; opacity:.6;">Loading...</td></tr>';
+let list = [];
+try {
+if (USE_FIRESTORE) {
+const snap = await db.collection('users').get();
+snap.forEach(d => list.push({ id: d.id, ...d.data() }));
+} else {
+list = localGetUsers().map(u => ({ id: (u.username || '').toLowerCase(), ...u }));
+}
+} catch (e) { console.error(e); list = []; }
+list.sort((a, b) => String(a.createdAt || '').localeCompare(String(b.createdAt || '')));
+if (!list.length) {
+tbody.innerHTML = '<tr><td colspan="4" style="text-align:center; padding:14px; opacity:.6;">No users found</td></tr>';
+return;
+}
+tbody.innerHTML = list.map(u => `
+<tr>
+<td><strong>${escapeHtml(u.username || u.id)}</strong></td>
+<td><span class="role-badge">${escapeHtml(u.role || 'Administrator')}</span></td>
+<td>${u.createdAt ? new Date(u.createdAt).toLocaleDateString('en-GB') : '-'}</td>
+<td><button class="btn btn-danger btn-small" onclick="deleteUser('${String(u.id).replace(/'/g, "\\'")}')">Delete</button></td>
+</tr>`).join('');
+}
+
+async function deleteUser(id) {
+if (!confirm('Delete user "' + id + '"? They will no longer be able to login.')) return;
+try {
+if (USE_FIRESTORE) {
+await db.collection('users').doc(id).delete();
+} else {
+localSetUsers(localGetUsers().filter(u => (u.username || '').toLowerCase() !== id));
+}
+showToast('User deleted');
+loadUsers();
+} catch (e) {
+console.error(e);
+showMsg('Delete failed: ' + (e.message || e), 'error');
+}
+}
+
+// ==========================================
+// INIT
+// ==========================================
+window.onload = function () {
+renderStatus();
+loadUsers();
+};
+</script>
+</body>
+</html>
